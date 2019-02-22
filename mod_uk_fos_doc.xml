@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="3.6" client="site" method="upgrade">
+	<name>UkFosDoc</name>
+	<author>SK</author>
+	<creationDate>February, 2017</creationDate>
+	<copyright>Copyright (C) SK. All rights reserved.</copyright>
+	<license>GNU GPLv3</license>
+	<authorEmail>mightyskeet@gmail.com</authorEmail>
+	<authorUrl></authorUrl>
+	<version>1.5.11</version>
+	<description>MOD_UK_FOS_DOC_XML_DESCRIPTION</description>
+	<files>
+		<folder>language</folder>
+		<folder>tmpl</folder>
+		<folder>sql</folder>
+		<folder>script</folder>
+		<folder>fields</folder>
+		<filename>helper.php</filename>
+		<filename>index.html</filename>
+		<filename module="mod_uk_fos_doc">mod_uk_fos_doc.php</filename>
+	</files>
+	<media folder="media" destination="mod_uk_fos_doc">
+		<folder>css</folder>
+		<folder>js</folder>
+		<filename>index.html</filename>
+	</media>
+	<languages>
+		<language tag="en-GB">language/en-GB/en-GB.mod_uk_fos_doc.ini</language>
+		<language tag="en-GB">language/en-GB/en-GB.mod_uk_fos_doc.sys.ini</language>
+		<language tag="ru-RU">language/ru-RU/ru-RU.mod_uk_fos_doc.ini</language>
+		<language tag="ru-RU">language/ru-RU/ru-RU.mod_uk_fos_doc.sys.ini</language>
+	</languages>
+
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates</schemapath>
+		</schemas>
+	</update>
+
+	<scriptfile>script/mod_uk_fos_doc.script.php</scriptfile>
+
+	<updateservers>
+		<server type="extension" name="mod_uk_fos_doc" priority="1">http://tpl.ais-web.ru/updates/mod_uk_fos_doc.xml</server>
+	</updateservers>
+
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+                <field
+                    name="pattern_name"
+                    type="text"
+                    default="имя шаблона"
+                    label="MOD_UK_FOS_DOC_COUNT_LABEL"
+                    description="MOD_UK_FOS_DOC_COUNT_DESC" />
+				<field
+					type="text"
+					name="mail_subject"
+					label="MOD_UK_FOS_DOC_MAIL_SUBJECT_LABEL"
+					description="MOD_UK_FOS_DOC_MAIL_SUBJECT_DESC"
+					size="120"
+					required="true"
+				/>
+				<field
+					type="email"
+					name="recipient"
+					label="MOD_UK_FOS_DOC_RECIPIENT_LABEL"
+					description="MOD_UK_FOS_DOC_RECIPIENT_DESC"
+					size="200"
+					required="true"
+					validate="email"
+				/>
+				<field
+					type="text"
+					name="cc"
+					label="MOD_UK_FOS_DOC_CC_LABEL"
+					description="MOD_UK_FOS_DOC_CC_DESC"
+					size="120"
+				/>
+				<field
+					type="text"
+					name="bcc"
+					label="MOD_UK_FOS_DOC_BCC_LABEL"
+					description="MOD_UK_FOS_DOC_BCC_DESC"
+					size="120"
+				/>
+				<field
+					type="text"
+					name="sender"
+					label="MOD_UK_FOS_DOC_SENDER_LABEL"
+					description="MOD_UK_FOS_DOC_SENDER_DESC"
+					size="60"
+				/>
+				<field
+					type="radio"
+					name="track_url"
+					label="MOD_UK_FOS_DOC_TRACK_URL_LABEL"
+					description="MOD_UK_FOS_DOC_TRACK_URL_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+			</fieldset>
+			<fieldset name="fields" addfieldpath="/modules/mod_uk_fos_doc/fields">
+				<field
+					type="Assets"
+					name="assets"
+				/>
+				<field
+					type="subform"
+					name="field"
+					label=""
+					formsource="modules/mod_uk_fos_doc/fields/fields.xml"
+					groupByFieldset="false"
+					layout="joomla.form.field.subform.repeatable-table"
+					multiple="true"
+					min="0"
+					default='{
+						"field-0": {
+							"type":			"text",
+							"title":		"Имя",
+							"attributes":	"",
+							"required":		1,
+							"published":	1
+						},
+						"field-1": {
+							"type":			"tel",
+							"title":		"Телефон",
+							"attributes":	"",
+							"required":		0,
+							"published":	1
+						},
+						"field-2": {
+							"type":			"email",
+							"title":		"Email",
+							"attributes":	"",
+							"required":		1,
+							"published":	1
+						},
+						"field-3": {
+							"type":			"textarea",
+							"title":		"Сообщение",
+							"attributes":	"rows=\"3\"",
+							"required":		0,
+							"published":	1
+						}
+					}'
+				/>
+				<field
+					type="note"
+					name="fileds_options_note"
+					label="MOD_UK_FOS_DOC_FIELD_OPTIONS"
+					description="MOD_UK_FOS_DOC_FIELD_OPTIONS_NOTE_DESC"
+					class="alert alert-info"
+				/>
+				<field
+					type="note"
+					name="fileds_attribs_note"
+					label="MOD_UK_FOS_DOC_FIELD_ATTRIBUTES"
+					description="MOD_UK_FOS_DOC_FIELD_ATTRIBUTES_DESC"
+					class="alert"
+				/>
+			</fieldset>
+			<fieldset name="settings">
+				<field type="note" name="js_note" label="MOD_UK_FOS_DOC_JS"/>
+
+				<field
+					type="radio"
+					name="jquery_use"
+					label="MOD_UK_FOS_DOC_JQUERY_USE_LABEL"
+					description="MOD_UK_FOS_DOC_JQUERY_USE_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="radio"
+					name="core_js_use"
+					label="MOD_UK_FOS_DOC_CORE_JS_USE_LABEL"
+					description="MOD_UK_FOS_DOC_CORE_JS_USE_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="radio"
+					name="uikit_notify_js_use"
+					label="MOD_UK_FOS_DOC_UIKIT_NOTIFY_JS_USE_LABEL"
+					description="MOD_UK_FOS_DOC_UIKIT_NOTIFY_JS_USE_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="list"
+					name="js_load_method"
+					label="MOD_UK_FOS_DOC_JS_LOAD_METHOD_LABEL"
+					description="MOD_UK_FOS_DOC_JS_LOAD_METHOD_DESC"
+					default="defer"
+					>
+					<option value="default">MOD_UK_FOS_DOC_JS_LOAD_METHOD_NONE</option>
+					<option value="async">MOD_UK_FOS_DOC_JS_LOAD_METHOD_ASYNC</option>
+					<option value="defer">MOD_UK_FOS_DOC_JS_LOAD_METHOD_DEFER</option>
+					<option value="both">MOD_UK_FOS_DOC_JS_LOAD_METHOD_BOTH</option>
+				</field>
+				<field
+					type="textarea"
+					name="extra_js_success"
+					label="MOD_UK_FOS_DOC_EXTRA_JS_SUCCESS_LABEL"
+					description="MOD_UK_FOS_DOC_EXTRA_JS_SUCCESS_DESC"
+					filter="raw"
+					rows="5"
+				/>
+
+				<field type="note" name="antispam_note" label="MOD_UK_FOS_DOC_ANTISPAM"/>
+
+				<field
+					type="radio"
+					name="honeypot"
+					label="MOD_UK_FOS_DOC_HONEYPOT_LABEL"
+					description="MOD_UK_FOS_DOC_HONEYPOT_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="radio"
+					name="recaptcha"
+					label="MOD_UK_FOS_DOC_RECAPTCHA_LABEL"
+					description="MOD_UK_FOS_DOC_RECAPTCHA_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+				<field type="note" name="form_note" label="MOD_UK_FOS_DOC_FORM"/>
+
+				<field
+					type="radio"
+					name="clean_form"
+					label="MOD_UK_FOS_DOC_CLEAN_FORM_LABEL"
+					description="MOD_UK_FOS_DOC_CLEAN_FORM_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="radio"
+					name="close_uikit_modal"
+					label="MOD_UK_FOS_DOC_CLOSE_UIKIT_MODAL_LABEL"
+					description="MOD_UK_FOS_DOC_CLOSE_UIKIT_MODAL_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="list"
+					name="form_labeling"
+					label="MOD_UK_FOS_DOC_FORM_LABELING_LABEL"
+					description="MOD_UK_FOS_DOC_FORM_LABELING_DESC"
+					default="label"
+					>
+					<option value="label">MOD_UK_FOS_DOC_FORM_LABELING_USE_LABEL</option>
+					<option value="placeholder">MOD_UK_FOS_DOC_FORM_LABELING_USE_PLACEHOLDER</option>
+				</field>
+				<field
+					type="list"
+					name="alert_system"
+					label="MOD_UK_FOS_DOC_ALERT_SYSTEM_LABEL"
+					description="MOD_UK_FOS_DOC_ALERT_SYSTEM_DESC"
+					default="uikit.notify"
+					>
+					<option value="default">MOD_UK_FOS_DOC_ALERT_DEFAULT</option>
+					<option value="redirect">MOD_UK_FOS_DOC_ALERT_REDIRECT</option>
+					<option value="uikit_notify">MOD_UK_FOS_DOC_ALERT_UIKIT_NOTIFY</option>
+					<option value="joomla_message">MOD_UK_FOS_DOC_ALERT_JOOMLA_MESSAGE</option>
+				</field>
+				<field
+					type="url"
+					name="redirect_url"
+					label="MOD_UK_FOS_DOC_FIELD_REDIRECT_URL_LABEL"
+					description="MOD_UK_FOS_DOC_FIELD_REDIRECT_URL_DESC"
+					size="120"
+					showon="alert_system:redirect"
+				/>
+				<field
+					type="number"
+					name="alert_timeout"
+					label="MOD_UK_FOS_DOC_ALERT_TIMEOUT_LABEL"
+					description="MOD_UK_FOS_DOC_ALERT_TIMEOUT_DESC"
+					default="5000"
+					step="500"
+					min="1000"
+					showon="alert_system:uikit_notify"
+				/>
+				<field
+					type="list"
+					name="alert_position"
+					label="MOD_UK_FOS_DOC_ALERT_POSITION_LABEL"
+					description="MOD_UK_FOS_DOC_ALERT_POSITION_DESC"
+					default="top-center"
+					showon="alert_system:uikit_notify"
+					>
+					<option value="top-left">MOD_UK_FOS_DOC_TOP_LEFT</option>
+					<option value="top-center">MOD_UK_FOS_DOC_TOP_CENTER</option>
+					<option value="top-right">MOD_UK_FOS_DOC_TOP_RIGHT</option>
+					<option value="bottom-left">MOD_UK_FOS_DOC_BOTTOM_LEFT</option>
+					<option value="bottom-center">MOD_UK_FOS_DOC_BOTTOM_CENTER</option>
+					<option value="bottom-right">MOD_UK_FOS_DOC_BOTTOM_RIGHT</option>
+				</field>
+				<field
+					type="list"
+					name="form_orient"
+					label="MOD_UK_FOS_DOC_FORM_ORIENTATION_LABEL"
+					description="MOD_UK_FOS_DOC_FORM_ORIENTATION_DESC"
+					default="stacked"
+					>
+					<option value="stacked">MOD_UK_FOS_DOC_FORM_ORIENTATION_STACKED</option>
+					<option value="horizontal">MOD_UK_FOS_DOC_FORM_ORIENTATION_HORIZONTAL</option>
+				</field>
+				<field
+					type="list"
+					name="btn_style"
+					label="MOD_UK_FOS_DOC_BUTTON_STYLE_LABEL"
+					description="MOD_UK_FOS_DOC_BUTTON_STYLE_DESC"
+					default="primary"
+					>
+					<option value="">MOD_UK_FOS_DOC_BUTTON_STYLE_DEFAULT</option>
+					<option value="primary">MOD_UK_FOS_DOC_BUTTON_STYLE_PRIMARY</option>
+					<option value="danger">MOD_UK_FOS_DOC_BUTTON_STYLE_DANGER</option>
+					<option value="success">MOD_UK_FOS_DOC_BUTTON_STYLE_SUCCESS</option>
+					<option value="link">MOD_UK_FOS_DOC_BUTTON_STYLE_LINK</option>
+				</field>
+				<field
+					type="text"
+					name="invalid_class"
+					label="MOD_UK_FOS_DOC_INVALID_CLASS_LABEL"
+					description="MOD_UK_FOS_DOC_INVALID_CLASS_DESC"
+					default="uk-form-danger uk-animation-shake"
+					size="120"
+				/>
+				<field
+					type="text"
+					name="valid_class"
+					label="MOD_UK_FOS_DOC_VALID_CLASS_LABEL"
+					description="MOD_UK_FOS_DOC_VALID_CLASS_DESC"
+					size="120"
+				/>
+				<field
+					type="text"
+					name="btn_class"
+					label="MOD_UK_FOS_DOC_BUTTON_CLASS"
+					default="uk-button-large"
+					size="60"
+				/>
+				<field
+					type="text"
+					name="btn_text"
+					label="MOD_UK_FOS_DOC_BUTTON_TEXT_LABEL"
+					description="MOD_UK_FOS_DOC_BUTTON_TEXT_DESC"
+					size="60"
+					filter="safehtml"
+				/>
+				<field
+					type="text"
+					name="btn_onsubmit_text"
+					label="MOD_UK_FOS_DOC_BUTTON_ONSUBMIT_TEXT_LABEL"
+					description="MOD_UK_FOS_DOC_BUTTON_ONSUBMIT_TEXT_DESC"
+					size="60"
+				/>
+
+				<field type="note" name="data_note" label="MOD_UK_FOS_DOC_DATA"/>
+
+				<field
+					type="text"
+					name="upload_path"
+					label="MOD_UK_FOS_DOC_UPLOAD_PATH_LABEL"
+					description="MOD_UK_FOS_DOC_UPLOAD_PATH_DESC"
+					default="images/uploads"
+					size="120"
+				/>
+				<field
+					type="number"
+					name="upload_max_size"
+					label="MOD_UK_FOS_DOC_UPLOAD_MAX_SIZE_LABEL"
+					description="MOD_UK_FOS_DOC_UPLOAD_MAX_SIZE_DESC"
+					default="5000"
+					step="100"
+					min="1"
+				/>
+				<field
+					type="list"
+					name="attachment_behavior"
+					label="MOD_UK_FOS_DOC_ATTACHMENT_BEHAVIOR_LABEL"
+					description="MOD_UK_FOS_DOC_ATTACHMENT_BEHAVIOR_DESC"
+					default="1"
+					>
+					<option value="1">MOD_UK_FOS_DOC_ATTACHMENT_BEHAVIOR_DIRECTLY</option>
+					<option value="0">MOD_UK_FOS_DOC_ATTACHMENT_BEHAVIOR_URL</option>
+				</field>
+				<field
+					type="list"
+					name="nodata_behavior"
+					label="MOD_UK_FOS_DOC_NODATA_BEHAVIOR_LABEL"
+					description="MOD_UK_FOS_DOC_NODATA_BEHAVIOR_DESC"
+					default="0"
+					>
+					<option value="0">MOD_UK_FOS_DOC_NODATA_BEHAVIOR_EXCLUDE</option>
+					<option value="1">MOD_UK_FOS_DOC_NODATA_BEHAVIOR_INCLUDE</option>
+				</field>
+				<field
+					type="radio"
+					name="send_remote_ip"
+					label="MOD_UK_FOS_DOC_SEND_REMOTE_IP_LABEL"
+					description="MOD_UK_FOS_DOC_SEND_REMOTE_IP_DESC"
+					default="1"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+
+				<field type="note" name="logs_note" label="COM_MODULES_LOGS_FIELDSET_LABEL"/>
+
+				<field
+					type="list"
+					name="log_behavior"
+					label="MOD_UK_FOS_DOC_LOG_BEHAVIOR_LABEL"
+					description="MOD_UK_FOS_DOC_LOG_BEHAVIOR_DESC"
+					default="2"
+					>
+					<option value="0">MOD_UK_FOS_DOC_LOG_NEVER</option>
+					<option value="1">MOD_UK_FOS_DOC_LOG_ERRORS</option>
+					<option value="2">MOD_UK_FOS_DOC_LOG_ALWAYS</option>
+				</field>
+				<field
+					type="list"
+					name="log_collect"
+					label="MOD_UK_FOS_DOC_LOG_COLLECT_LABEL"
+					description="MOD_UK_FOS_DOC_LOG_COLLECT_DESC"
+					default="1"
+					showon="log_behavior:1,2"
+					>
+					<option value="0">MOD_UK_FOS_DOC_LOG_COLLECT_ONLY_STATE</option>
+					<option value="1">MOD_UK_FOS_DOC_LOG_COLLECT_ALL</option>
+				</field>
+			</fieldset>
+			<fieldset name="text">
+				<field
+					type="text"
+					name="error_msg"
+					label="MOD_UK_FOS_DOC_ERROR_MESSAGE_LABEL"
+					description="MOD_UK_FOS_DOC_MESSAGE_DESC"
+					size="120"
+					class="input-xxlarge"
+					filter="safehtml"
+				/>
+				<field
+					type="text"
+					name="invalid_recaptcha_msg"
+					label="MOD_UK_FOS_DOC_INVALID_RECAPTCHA_MESSAGE_LABEL"
+					description="MOD_UK_FOS_DOC_MESSAGE_DESC"
+					size="120"
+					class="input-xxlarge"
+					filter="safehtml"
+				/>
+				<field
+					type="text"
+					name="success_msg"
+					label="MOD_UK_FOS_DOC_SUCCESS_MESSAGE_LABEL"
+					description="MOD_UK_FOS_DOC_MESSAGE_DESC"
+					size="120"
+					class="input-xxlarge"
+					filter="safehtml"
+				/>
+				<field
+					type="text"
+					name="nodata_text"
+					label="MOD_UK_FOS_DOC_NODATA_TEXT_LABEL"
+					description="MOD_UK_FOS_DOC_NODATA_TEXT_DESC"
+					size="60"
+					class="input-xxlarge"
+				/>
+				<field
+					type="editor"
+					name="form_intro"
+					label="MOD_UK_FOS_DOC_INTRO_TEXT_LABEL"
+					description="MOD_UK_FOS_DOC_INTRO_TEXT_DESC"
+					filter="safehtml"
+					buttons="false"
+					width="530"
+					height="300"
+				/>
+				<field
+					type="editor"
+					name="terms_text"
+					label="MOD_UK_FOS_DOC_TERMS_TEXT_LABEL"
+					description="MOD_UK_FOS_DOC_TERMS_TEXT_DESC"
+					filter="safehtml"
+					buttons="false"
+					width="530"
+					height="300"
+				/>
+				<field
+					type="radio"
+					name="use_mail_tpl"
+					label="MOD_UK_FOS_DOC_USE_MAIL_TPL_LABEL"
+					description="MOD_UK_FOS_DOC_USE_MAIL_TPL_DESC"
+					default="0"
+					class="btn-group btn-group-yesno"
+					>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field
+					type="editor"
+					name="mail_tpl"
+					label="MOD_UK_FOS_DOC_MAIL_TPL_LABEL"
+					description="MOD_UK_FOS_DOC_MAIL_TPL_DESC"
+					filter="safehtml"
+					buttons="false"
+					width="530"
+					height="300"
+					showon="use_mail_tpl:1"
+				/>
+			</fieldset>
+			<fieldset name="logs">
+				<field
+					type="maillog"
+					name="maillog"
+					label="Mail Log"
+				/>
+			</fieldset>
+			<fieldset name="advanced">
+				<field
+					type="modulelayout"
+					name="layout"
+					label="JFIELD_ALT_LAYOUT_LABEL"
+					description="JFIELD_ALT_MODULE_LAYOUT_DESC"
+				/>
+				<field
+					type="textarea"
+					name="moduleclass_sfx"
+					label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL"
+					description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"
+					rows="3"
+				/>
+				<field
+					type="list"
+					name="cache"
+					label="COM_MODULES_FIELD_CACHING_LABEL"
+					description="COM_MODULES_FIELD_CACHING_DESC"
+					default="0"
+					>
+					<option value="1">JGLOBAL_USE_GLOBAL</option>
+					<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+				</field>
+				<field
+					type="text"
+					name="cache_time"
+					label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
+					description="COM_MODULES_FIELD_CACHE_TIME_DESC"
+					default="900"
+				/>
+				<field
+					type="hidden"
+					name="cachemode"
+					default="static"
+					>
+					<option value="static"></option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

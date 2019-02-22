@@ -1,0 +1,497 @@
+/**
+ * @package	Module UkFos AJAX contact form for Joomla! 3.2+
+ * @author	SK <mightyskeet@gmail.com>
+ * @license	GNU/GPLv3 [http://www.gnu.org/licenses/gpl-3.0.html]
+ */
+(function($) {
+	$().ready(function() {
+		$.validator.addMethod('accept', function(value, element, param) {
+			var typeParam = (typeof param === 'string') ? param.replace(/\s/g, '') : 'image/*',
+				optionalValue = this.optional(element),
+				i, file, regex;
+
+			if (optionalValue) return optionalValue;
+
+			if ($(element).attr('type') === 'file') {
+				typeParam = typeParam
+					.replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g, '\\$&')
+					.replace(/,/g, '|')
+					.replace(/\/\*/g, '/.*');
+
+				if (element.files && element.files.length) {
+					regex = new RegExp('.?(' + typeParam + ')$', 'i');
+
+					for (i = 0; i < element.files.length; i++) {
+						file = element.files[i];
+
+						if (!file.type.match(regex)) return false;
+					}
+				}
+			}
+
+			return true;
+		}, $.validator.messages.accept);
+
+		$.validator.addMethod('pattern', function(value, element, param) {
+			if (this.optional(element)) return true;
+
+			if (typeof param === 'string') {
+				param = new RegExp('^(?:' + param + ')$');
+			}
+
+			return param.test(value);
+		}, $.validator.messages.pattern);
+
+		$.validator.addMethod('time', function(value, element) {
+			return this.optional(element) || /^([01]\d|2[0-3]|[0-9])(:[0-5]\d){1,2}$/.test(value);
+		}, $.validator.messages.time);
+
+		$.validator.addMethod('require_from_group', function(value, element, options) {
+			var $fields = $(options[1], element.form),
+				$fieldsFirst = $fields.eq(0),
+				validator = $fieldsFirst.data('valid_req_grp') ? $fieldsFirst.data('valid_req_grp') : $.extend({}, this),
+				isValid = $fields.filter(function() {
+					return validator.elementValue(this);
+				}).length >= options[0];
+
+			$fieldsFirst.data('valid_req_grp', validator);
+
+			if (!$(element).data('being_validated')) {
+				$fields.data('being_validated', true);
+				$fields.each(function() {
+					validator.element(this);
+				});
+				$fields.data('being_validated', false);
+			}
+			return isValid;
+		}, $.validator.format('Please fill at least {0} of these fields.'));
+
+		var ukFosModernUploadSupport = function() {
+			var div = document.createElement('div'),
+				dnd = 'draggable' in div || ('ondragstart' in div && 'ondrop' in div),
+				api = 'FormData' in window && 'FileReader' in window;
+			return {dnd: dnd, api: api};
+		}();
+
+		function ukFosShowResponse(msg, status, settings) {
+			switch (settings.alert_system) {
+				case 'uikit_notify':
+					try {
+						UIkit.notify.closeAll();
+						UIkit.notify({
+							message	: msg,
+							status	: status,
+							timeout	: settings.alert_timeout,
+							pos		: settings.alert_position
+						});
+					} catch (e) {
+						console.log(e);
+					}
+					break;
+
+				case 'redirect':
+					if (settings.redirect_url && status == 'success') {
+						window.location.href = settings.redirect_url;
+					} else {
+						alert(msg);
+					}
+					break;
+
+				case 'joomla_message':
+					var jMsg = (status == 'success') ? {message: [msg]} : {error: [msg]};
+
+					try {
+						Joomla.renderMessages(jMsg);
+					} catch (e) {
+						console.log(e);
+					}
+					break;
+
+				default:
+				case 'default':
+					alert(msg);
+					break;
+			}
+		}
+
+		function ukFosFilesAdded(files, container, allowed, settings, files_count) {
+			var check_files = ukFosCheckFiles(allowed, files, settings);
+
+			if (check_files.allow) {
+				if (typeof files_count !== 'undefined') {
+					files_global[files_count] = files;
+				}
+				container.addClass('valid').css('backgroundColor', '#e4f5c6'); // TODO: Use classes
+			} else {
+				container.removeClass('valid').removeAttr('style'); // TODO: Use classes
+				ukFosShowResponse(check_files.message, 'danger', settings);
+				container.find('[type="file"]').val('').removeClass('ignore');
+				files = false;
+			}
+
+			ukFosAppendFileName(files, container);
+		}
+
+		function ukFosCheckFiles(allowed, files, settings) {
+			var message = null, allow = true;
+
+			$.each(files, function(i, file) {
+				var chunks	= file.name.split('.'),
+					ext		= chunks.splice(-1).join().toLowerCase(),
+					name	= chunks.join('.');
+
+				if (file.size > settings.upload_max_size) {
+					message = ($.validator.messages.upload_max_size).replace('{%1}', name);
+					file.error = true;
+					allow = false;
+				}
+
+				if (allowed && allowed.indexOf(ext) == -1) {
+					message = $.validator.messages.accept + ': ' + allowed.join(', ');
+					file.error = true;
+					allow = false;
+				}
+			});
+
+			return {allow: allow, message: message};
+		}
+
+		function ukFosAppendFileName(files, place) {
+			var container = place.find('.upload-names');
+			container.html('');
+
+			if (!files) return;
+
+			$.each(files, function(i, file) {
+				var cls = 'uk-badge uk-margin-small-right';
+				container.append($('<div>' + file.name + '</div>').addClass(cls));
+			});
+		}
+
+		var dropped_files, files_global = {};
+
+		if (Joomla.getOptions) {
+			var overrides = Joomla.getOptions('uk-fos-overrides');
+
+			for (entry in overrides.format) {
+				entry = $.validator.format(entry);
+			}
+
+			$.extend($.validator.messages, overrides.basic, overrides.format);
+		}
+
+		$('.uk-fos-form').each(function() {
+			if (Joomla.getOptions) {
+				var settings = Joomla.getOptions($(this).attr('id'));
+			} else {
+				var settings = window.ukFosSettings[$(this).attr('id')];
+			}
+
+			$(this).trigger('form-init', [settings]);
+
+			$(this).find('select').each(function() {
+				if ($(this).val() !== null) {
+					$(this).removeClass('not-selected');
+				}
+
+				$(this).on('change', function() {
+					$(this).removeClass('not-selected');
+				});
+			});
+
+			if (!ukFosModernUploadSupport.api) {
+				$(this).addClass('fallback');
+
+				$(this).find('[type="file"]').each(function() {
+					var names_box = $(this).closest('.upload-names');
+
+					$(this).on('change', function(e) {
+						names_box.html('');
+
+						var files	= $(this)[0].files,
+							total	= files.length,
+							valid	= $(this).valid(); // TODO: Check this
+
+						if (total > 0 && valid) {
+							for (var i = 0; i < total; i++) {
+								var div = $('<div>').addClass('file-' + i);
+								div.append($('<small>' + files[i].name + '</small>'));
+								names_box.addClass('files-added').append(div);
+							}
+						} else {
+							names_box.removeClass('files-added');
+						}
+					});
+				});
+			}
+
+			if (ukFosModernUploadSupport.dnd) {
+				$(this).find('.dragndrop').removeClass('uk-hidden');
+
+				$(this).find('.upload-drop').each(function() {
+					var container = $(this),
+						input_file = container.find('[type="file"]');
+
+					if (input_file.is('[accept]')) {
+						input_file.attr('data-accept', input_file.attr('accept')).removeAttr('accept');
+					}
+
+					var files_count = 0,
+						allowed = input_file.attr('data-accept');
+
+					allowed = allowed ? $.map(allowed.split(','), $.trim) : null;
+
+					container.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+					})
+					.on('dragover dragenter', function() {
+						container.addClass('dragover').css({backgroundColor: '#fff', border: '1px solid #333'}); // TODO: Use only classes
+					})
+					.on('dragleave dragend drop', function() {
+						container.removeClass('dragover').removeAttr('style'); // TODO: Use only classes
+					})
+					.on('drop', function(e) {
+						dropped_files = e.originalEvent.dataTransfer.files;
+						container.find('[type="file"]').val('').addClass('ignore');
+						ukFosFilesAdded(dropped_files, container, allowed, settings, files_count);
+					});
+
+					container.find('[type="file"]').on('change', function(e) {
+						$(this).removeClass('ignore');
+						ukFosFilesAdded(e.target.files, container, allowed, settings);
+					});
+				});
+			}
+
+			$(this).find('[data-showon]').each(function() {
+				var child = $(this),
+					dependencies = child.attr('data-showon').split(',');
+
+				child.attr('data-controlled', 'none')
+					 .addClass('ignore')
+					 .closest('.uk-form-row').hide();
+
+				$.each(dependencies, function(i, dep) {
+					dep = $.map(dep.split('='), $.trim);
+
+					var variants = $.map(dep[1].split(';'), $.trim);
+					var parents  = $('[name="field' + dep[0] + '"], [name=files\\[field' + dep[0] + '\\]\\[\\]]');
+
+					parents.each(function() {
+						$(this).on('change keyup', function() {
+							var value		= $(this).val(),
+								filled		= value !== null && value !== '' && typeof value !== 'undefined',
+								match_found = false;
+
+							if (variants.indexOf(value) != -1) match_found = true;
+							else if (variants.indexOf('*') != -1 && filled) match_found = true;
+							else if (variants.indexOf('**') != -1 && filled && $(this).valid()) match_found = true;
+
+							ukFosToggleField(match_found, child, dep[0]);
+						});
+
+						if ($(this).is('[type="file"]') && ukFosModernUploadSupport.dnd) {
+							var container = $(this).parent('.upload-drop');
+
+							container.on('drop', function() {
+								var case_1 = (variants == '*'),
+									case_2 = (variants == '**' && container.is('.valid'));
+
+								ukFosToggleField(case_1 || case_2, child, dep[0]);
+							});
+						}
+					});
+				});
+			});
+
+			function ukFosToggleField(match_found, el, parent_id) {
+				var attr_val = el.attr('data-controlled'),
+					values   = (attr_val != 'none') ? attr_val.split(',') : [],
+					val_pos  = values.indexOf(parent_id);
+
+				if (match_found && val_pos == -1) {
+					el.removeClass('ignore').closest('.uk-form-row').show(300);
+					values.push(parent_id);
+				} else if (!match_found && val_pos != -1) {
+					values.splice(val_pos, 1);
+				}
+
+				if (values.length != 0) {
+					el.attr('data-controlled', values.join(','));
+				} else {
+					el.attr('data-controlled', 'none').addClass('ignore');
+					el.closest('.uk-form-row').hide(300);
+				}
+			}
+
+			var _rules = {};
+
+			$(this).find('.checkbox-group.required').each(function() {
+				var group_name  = $(this).attr('id');
+				var group_class = $(this).find('[type=checkbox]:first').attr('name');
+
+				_rules[group_class] = {require_from_group: [1, '.' + group_name]};
+			});
+
+			var validate_set = {
+				// debug: true,
+				highlight: function(element, errorClass) {
+					if ($(element).is('.group-item')) {
+						$(element).closest('.checkbox-group').addClass(errorClass);
+					} else {
+						$(element).addClass(errorClass);
+					}
+				},
+				unhighlight: function(element, errorClass) {
+					if ($(element).is('.group-item')) {
+						$(element).closest('.checkbox-group').removeClass(errorClass);
+					} else {
+						$(element).removeClass(errorClass);
+					}
+				},
+				errorPlacement: function(error, element) {
+					if ($(element).is('.group-item')) {
+						error.insertAfter(element.closest('.checkbox-group'));
+					} else {
+						error.insertAfter(element);
+					}
+				},
+				ignore: '.ignore, [type="hidden"], [data-ignore]',
+				errorElement: 'span',
+				errorClass: settings.invalid_class,
+				validClass: settings.valid_class,
+				invalidHandler: function(event, validator) {
+					event.preventDefault();
+				},
+				submitHandler: function(form, event) {
+					event.preventDefault();
+					ukFosSendMail($(form), settings);
+				}
+			};
+
+			validate_set['rules'] = _rules;
+			$(this).validate(validate_set);
+		});
+
+		function ukFosSendMail(form, settings) {
+			var submit_btn = form.find('[type="submit"]'),
+				submit_btn_text_orig = submit_btn.html();
+
+			submit_btn.prop('disabled', true);
+
+			if (submit_btn.attr('data-onsubmit-text') != '') {
+				submit_btn.html(submit_btn.attr('data-onsubmit-text'));
+			}
+
+			var honeypot = form.find('[name="uk_fos_doc_proof"]').val();
+			if (typeof honeypot === 'undefined') honeypot = '';
+
+			var extra_inputs = form.find('[data-added]');
+
+			if (extra_inputs) {
+				var added = $('<input />', {type: 'hidden', name: 'added'}),
+					added_values = [], added_count = 0;
+
+				added.appendTo(form);
+
+				extra_inputs.each(function() {
+					added_values.push($(this).attr('name'));
+					$(this).attr('name', 'added' + added_count++);
+				});
+
+				added.attr('value', added_values.join('&&'));
+			}
+
+			if (ukFosModernUploadSupport.api) {
+				var formdata = new FormData(form[0]);
+
+				formdata.append('option', 'com_ajax');
+				formdata.append('module', 'uk_fos_doc');
+				formdata.append('format', 'raw');
+				formdata.append('Itemid', settings.Itemid);
+				formdata.append('mod_id', settings.mod_id);
+				formdata.append('uk_fos_doc_proof', honeypot);
+
+				if (settings.track_url) {
+					var origin = form.find('[name="uk_fos_doc_origin"]').val();
+					formdata.append('uk_fos_doc_origin', origin);
+				}
+
+				if (!$.isEmptyObject(files_global)) {
+					$.each(files_global, function(index, dropped_files) {
+						$.each(dropped_files, function(i, file) {
+							if (!file.error) {
+								formdata.append('files[' + i + '][]', file);
+							}
+						});
+					});
+				}
+
+				form.trigger('before-sending', [formdata, settings]);
+
+				$.ajax({
+					cache		: false,
+					contentType	: false,
+					processData	: false,
+					type		: 'post',
+					url			: '/',
+					data		: formdata
+				})
+				.done(function(data, textStatus, jqXHR) {
+					if (data && textStatus == 'success') {
+						var response = $.parseJSON(data);
+
+						if (response['state'] === true) {
+							form.trigger('ajax-state-success', [response, settings]);
+
+							if (settings.close_modal == 1) {
+								var modal = UIkit.modal(form.closest('.uk-modal'));
+								if (modal.isActive()) modal.hide();
+							}
+
+							if (settings.clean_form == 1) form[0].reset();
+
+							files_global = {};
+							form.find('[type="file"]').val('');
+							form.find('.upload-drop').removeAttr('style').find('.uk-badge').remove(); // TODO: Use only classes
+
+							ukFosShowResponse(response['msg'], 'success', settings);
+						} else {
+							form.trigger('ajax-state-error', [response, settings]);
+							ukFosShowResponse(response['msg'], 'danger', settings);
+						}
+
+					} else {
+						form.trigger('ajax-nodata', [jqXHR]);
+						ukFosShowResponse($.validator.messages.no_response_data, 'danger', settings);
+					}
+
+					setTimeout(function() {
+						submit_btn.prop('disabled', false).html(submit_btn_text_orig);
+					}, 500);
+				})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					form.trigger('ajax-fatal-error', [jqXHR, errorThrown]);
+					ukFosShowResponse($.validator.messages.fatal_error + ': ' + errorThrown, 'danger', settings);
+					submit_btn.prop('disabled', false).html(submit_btn_text_orig);
+				});
+			} else {
+				var base_url = window.location.protocol + '//' + window.location.hostname;
+					action = {
+						option : 'com_ajax',
+						module : 'uk_fos_doc',
+						format : 'raw',
+						method : 'fallback'
+					};
+
+				$('<input type="hidden" name="Itemid" value="' + settings.Itemid + '" />').appendTo(form);
+				$('<input type="hidden" name="mod_id" value="' + settings.mod_id + '" />').appendTo(form);
+
+				form.trigger('before-sending-fallback');
+				form.attr('action', base_url + '/index.php?' + $.param(action));
+				form[0].submit();
+			}
+		}
+	});
+})(jQuery);

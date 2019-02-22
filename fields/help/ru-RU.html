@@ -1,0 +1,101 @@
+<div class="row-fluid">
+
+	<div class="span2" id="help-sidebar-menu">
+		<ul class="nav nav-tabs nav-stacked nav-list">
+			<li class="nav-header">Поля</li>
+
+			<li><a href="#fos-fields">
+				<i class="icon-chevron-right"></i>Опции</a>
+			</li>
+
+			<li><a href="#fos-attribs">
+				<i class="icon-chevron-right"></i>Атрибуты</a>
+			</li>
+
+			<li class="nav-header">JavaScript</li>
+
+			<li><a href="#fos-js-events">
+				<i class="icon-chevron-right"></i>События</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="span6 content">
+		<section id="fos-fields">
+			<h2>Опции</h2>
+
+			<h4>Списки, чекбоксы, группы чекбоксов, радио</h4>
+
+			<p>Каждое Значение или пара Ключ-Значение указывается с новой строки. Для указания пары Ключ-Значение, используйте знак равенства между ними. Если указано только значение, оно также будет использовано в качестве ключа.</p>
+
+			<pre>
+				<code class="language-markup line-numbers code-toolbar">
+					40 = Малый
+					60 = Средний
+					80 = Большой
+				</code>
+			</pre>
+		</section>
+
+		<section id="fos-attribs">
+			<h2>Атрибуты</h2>
+
+			<p>Для каждого поля вы можете указать HTML-атрибуты. Атрибуты должны быть указаны через пробел.</p>
+			<p>Для того, чтобы в списке по умолчанию был выбран определённый элемент, используйте атрибут <code>data-selected="значение"</code>.</p>
+
+			<pre>
+				<code class="language-markup line-numbers code-toolbar">
+					readonly min="1" max="100" data-custom-attribute="custom_data"
+				</code>
+			</pre>
+
+			<p>Для появления поля только при соответствии условию, используйте <code>data-showon="0=100"</code>, где 0 — это номер (указан слева) родительского поля, и 100 — это значение, при котором будет срабатывать условие.</p>
+			<p>Также, вместо такого значения можно использовать <code>*</code>, чтобы условие срабатывало когда поле заполнено и <code>**</code>, когда поле заполненно с учётом валидации.</p>
+			<p>Несколько условий могут быть заданы через запятую, условия для каждого родительского поля могут быть указаны через точку с запятой.</p>
+			<p>Комбинированный пример:</p>
+
+			<pre>
+				<code class="language-markup line-numbers code-toolbar">
+					data-showon="0=100;200;300, 1=brown, 2=mail@mail.com;**, 3=*"
+				</code>
+			</pre>
+
+			<blockquote>
+				<h4>Объяснение условий</h4>
+				<h5>Показывать поле, если одно из этих условий верно:</h5>
+				<ol>
+					<li>Поле с номером 0 имеет значения 100 или 200 или 300</li>
+					<li>Значение поля с номером 1 равно «brown»</li>
+					<li>Поле с номером 2 равно «mail@mail.com либо заполено корректно</li>
+					<li>Поле с номером 3 не пустое</li>
+				</ol>
+			</blockquote>
+
+			<p>Для поля типа «Файл» вы можете указать допустимые расширения файлов для загрузки, используя атрибут «accept»:</p>
+
+			<pre>
+				<code class="language-markup line-numbers code-toolbar">
+					accept="txt, doc, jpg, jpeg, png"
+				</code>
+			</pre>
+		</section>
+
+		<section id="fos-js-events">
+			<h2>События</h2>
+
+			<pre>
+				<code class="language-javascript line-numbers code-toolbar">
+					(function($) {
+						$().ready(function() {
+							$('.uk-fos-form').on('ajax-state-success', function($data) {
+								// Show response status and current form settings
+								console.log($data.response, $data.settings);
+							});
+						});
+					})(jQuery);
+				</code>
+			</pre>
+		</section>
+	</div>
+
+</div>

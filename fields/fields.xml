@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset>
+		<field
+			type="spacer"
+			name="row-num"
+			label="MOD_UK_FOS_DOC_FIELD_NUM"
+		/>
+		<field
+			type="list"
+			name="type"
+			label="MOD_UK_FOS_DOC_FIELD_TYPE_LABEL"
+			default="text"
+			class="input-large"
+			>
+			<option value="text">MOD_UK_FOS_DOC_FIELD_TYPE_TEXT</option>
+			<option value="textarea">MOD_UK_FOS_DOC_FIELD_TYPE_TEXTAREA</option>
+			<option value="email">MOD_UK_FOS_DOC_FIELD_TYPE_EMAIL</option>
+			<option value="tel">MOD_UK_FOS_DOC_FIELD_TYPE_PHONE</option>
+			<option value="number">MOD_UK_FOS_DOC_FIELD_TYPE_NUMBER</option>
+			<option value="date">MOD_UK_FOS_DOC_FIELD_TYPE_DATE</option>
+			<option value="time">MOD_UK_FOS_DOC_FIELD_TYPE_TIME</option>
+			<option value="url">MOD_UK_FOS_DOC_FIELD_TYPE_URL</option>
+			<option value="file">MOD_UK_FOS_DOC_FIELD_TYPE_FILE</option>
+			<option value="select">MOD_UK_FOS_DOC_FIELD_TYPE_SELECT</option>
+			<option value="checkbox">MOD_UK_FOS_DOC_FIELD_TYPE_CHECKBOX</option>
+			<option value="radio">MOD_UK_FOS_DOC_FIELD_TYPE_RADIO</option>
+			<option value="checkbox-group">MOD_UK_FOS_DOC_FIELD_TYPE_CHECKBOX_GROUP</option>
+			<option value="html">MOD_UK_FOS_DOC_FIELD_TYPE_HTML</option>
+			<option value="hidden">MOD_UK_FOS_DOC_FIELD_TYPE_HIDDEN</option>
+		</field>
+		<field
+			type="text"
+			name="title"
+			label="MOD_UK_FOS_DOC_FIELD_TITLE"
+			size="60"
+			class="input-medium"
+		/>
+		<field
+			type="text"
+			name="attributes"
+			label="MOD_UK_FOS_DOC_FIELD_ATTRIBUTES"
+			size="120"
+			class="input-xlarge"
+			filter="raw"
+		/>
+		<field
+			type="textarea"
+			rows="3"
+			name="options"
+			label="MOD_UK_FOS_DOC_FIELD_OPTIONS"
+			filter="raw"
+			showon="type:select,radio,html,checkbox-group"
+		/>
+		<field
+			type="checkbox"
+			name="required"
+			label="MOD_UK_FOS_DOC_FIELD_REQUIRED"
+			default="0"
+			value="1"
+			showon="type!:html"
+		/>
+		<field
+			type="checkbox"
+			name="published"
+			label="MOD_UK_FOS_DOC_FIELD_PUBLISHED"
+			default="1"
+			value="1"
+		/>
+	</fieldset>
+</form>

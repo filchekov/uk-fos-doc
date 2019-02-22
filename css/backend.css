@@ -1,0 +1,114 @@
+#attrib-fields .control-label,
+#attrib-logs .control-label {
+	display: none;
+}
+
+#attrib-fields .controls,
+#attrib-logs .controls {
+	margin-left: 0;
+}
+
+#attrib-fields th:first-child,
+#attrib-fields td:first-child,
+#attrib-logs th:first-child,
+#attrib-logs td:first-child {
+	text-align: center;
+}
+
+#attrib-logs th:first-child input,
+#attrib-logs td:first-child input {
+	margin: 0;
+}
+
+.margin-bottom {
+	margin-bottom: 15px;
+}
+
+#attrib-help {
+	font-size: 14px;
+	line-height: 1.4;
+	padding-bottom: 600px;
+}
+
+#attrib-help .content section {
+	// margin-bottom: 20px;
+	padding: 15px;
+	// border: 1px solid #ddd;
+}
+
+#attrib-help .content section + section {
+	margin-top: 30px;
+	padding-top: 30px;
+	border-top: 1px solid #ddd;
+}
+
+#attrib-help pre {
+	margin: 20px 0;
+}
+
+#attrib-help pre,
+#attrib-help code {
+	font-size: 14px;
+}
+
+#attrib-help #help-sidebar-menu {
+	margin-right: 15px;
+}
+
+@media (max-width: 767px) {
+	#attrib-help #help-sidebar-menu {
+		display: none;
+	}
+}
+
+#attrib-help .nav-list {
+	top: 100px;
+	width: 228px;
+	margin: 0;
+	padding: 0;
+	padding-left: 15px;
+	background-color: #fff;
+	border-radius: 6px;
+}
+
+#attrib-help .nav-list .icon-chevron-right {
+	float: right;
+	margin-top: 2px;
+	margin-right: -6px;
+	opacity: .25;
+}
+
+#attrib-help .nav-list > .active .icon-chevron-right {
+	opacity: 1;
+}
+
+#attrib-help .nav-list > .active > a,
+#attrib-help .nav-list > .active > a:hover,
+#attrib-help .nav-list > .active > a:focus {
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+	background-color: #0088cc;
+}
+
+@media (min-width: 1200px) {
+	#attrib-help .nav-list {
+		width: 258px;
+	}
+}
+
+@media (max-width: 979px) and (min-width: 768px) {
+	#attrib-help .nav-list {
+		width: 166px;
+		margin-top: 20px;
+	}
+}
+
+@media (max-width: 767px) {
+	#attrib-help .nav-list.affix {
+		position: static;
+		width: auto;
+		top: 0;
+		margin-bottom: 15px;
+		margin-left: 15px;
+	}
+}
