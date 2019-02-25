@@ -65,7 +65,7 @@ if ($form->intro) echo $form->intro; ?>
 		<?php endif; ?>
 
 		<div class="uk-form-row form-group <?php echo $form->align_elements ? "uk-form-controls" : "uk-text-center text-center"; ?>">
-			<input class="uk-button <?php echo $btn->class; ?> msdoc" type="submit" value="Сохранить">
+			<input class="uk-button <?php echo $btn->class; ?> msdoc" id='sbtn' type="submit" value="Сохранить">
 		</div>
 
 		<?php if ($form->terms_text) : ?>
@@ -77,11 +77,16 @@ if ($form->intro) echo $form->intro; ?>
 </form>
 
 <script type="text/javascript">
-	/*jQuery(document).ready(function () {
-		alert("load");
-	});*/
+	function ReloadPage(){
+		window.location.reload();
+	}
+
+   document.getElementById('sbtn').onclick = function (event){
+        setTimeout(ReloadPage, 3000);
+    } 
 
 	function before_submit(elem) {
+		//setCookie('upd','yes',7);
 		// подготовить поля к отправке
 		// перебераем все поля в форме
 		jQuery(elem).each(function () {
@@ -187,8 +192,9 @@ if ($form->intro) echo $form->intro; ?>
 			var deleteButton = document.createElement("button");
 
 			deleteButton.setAttribute("type", "button");
-			deleteButton.setAttribute("style", "vertical-align: top");
+			deleteButton.setAttribute("style", "background: -webkit-gradient(linear, 0 0, 0 100%, from(#39f), to(#39f));height: 48px;width: 50px;font-size: 22px;vertical-align: bottom;border: 0px;");
 			deleteButton.setAttribute("class", "uk-for-del-button");
+			deleteButton.setAttribute("title", "удалить поле");
 			deleteButton.innerHTML = "X";
 			deleteButton.setAttribute("onclick", "delete_button_click(this);");
 			insertAfter(deleteButton, newInput);

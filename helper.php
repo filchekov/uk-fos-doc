@@ -631,6 +631,7 @@ class Word extends ZipArchive{
 				$text = str_replace("{doc_form}", $formContent, $text);
 			}
 			else {
+				//echo "<pre>"; var_dump($_POST); die();
 				// перебераем этот массив последовательно
 				foreach ($_POST as $key => $value) {
 					$divideToLinesValue = explode("\n", str_replace("\r", '', $value));
@@ -661,7 +662,6 @@ class Word extends ZipArchive{
 					if ($listRootField) {
 						$currentList[] = $value;
 						$numberRootField = str_replace("list", "", $key);
-						//echo "<pre>"; var_dump($key, $numberRootField); die();
 						// найти все поля от текущего принадлежащие этому корню
 						foreach ($_POST as $innerKey => $innerValue) {
 							// получить все поля с именем в котором есть слово rootНомер_поля
@@ -676,21 +676,11 @@ class Word extends ZipArchive{
 
 						$listText = "";
 
-						/*for ($i = 0; $i < (count($currentList) - 1); $i++) {
-							//$listText .= ($i + 1).'. '.$currentList[$i].'</w:t><w:br/><w:br/><w:t>'; 
-							echo $currentList.'\n';
-						}
-
-						die();*/
-
 						for ($i = 0; $i < (count($currentList) - 1); $i++) {
 							$listText .= ($i + 1).'. '.$currentList[$i].'</w:t><w:br/><w:br/><w:t>'; 
 						}
 
 						$listText .= count($currentList).'. '.$currentList[count($currentList) - 1];
-
-
-
 						$text = str_replace('{'.$key.'}', $listText, $text); // и заменить в шаблоне
 					}
 				}
@@ -723,14 +713,20 @@ class Word extends ZipArchive{
 		 		$name = "./tmp/".$params["pattern_name"].'.docx';
 		 		//echo "<pre>"; var_dump($name); die();
 		 		//echo "<pre>"; var_dump($name); die();
-				$fp = fopen($name, 'rb');
+				/*$fp = fopen($name, 'rb');
 				// отправляем нужные заголовки
 				header("Content-Type: application/msword");
 				header('Content-Disposition: attachment; filename=' . basename($name));
 				header("Content-Length: " . filesize($name));
 				// скидываем картинку и останавливаем выполнение скрипта
-				fpassthru($fp);
-				exit;
+				fpassthru($fp);*/
+				//exit;
+
+				//header("Location: http://test.lawmobile.ru/tmp/hide.docx");
+				
+				header("Location: /tmp/".$params["pattern_name"].'.docx');
+				//echo "<pre>"; var_dump("Location: ".$_SERVER['SERVER_NAME']."/tmp/".$params["pattern_name"].'.docx'); die();
+
 		 	}
 	 	}
 	} 
